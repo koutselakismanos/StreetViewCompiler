@@ -17,13 +17,19 @@
 			text-align: center;
 		}
 
-		/* #locationField, #controls {
+		#locationField, #controls {
         position: relative;
         width: 480px;
 		}
 
 		#autocomplete {
-			position: absolute;
+			position: relative;
+			top: 0px;
+			left: 0px;
+			width: 99%;
+		}
+		#autocomplete2 {
+			position: relative;
 			top: 0px;
 			left: 0px;
 			width: 99%;
@@ -57,7 +63,7 @@
 		#locationField {
 			height: 20px;
 			margin-bottom: 2px;
-		} */
+		}
 	</style>
 </head>
 
@@ -65,8 +71,8 @@
 	<h1>Sreet View Compiler</h1>
 	<div id="map"></div>
 	<form action="" method="post">
-		<input id="autocomplete" placeholder="Enter starting location" onFocus="geolocate()" type="text" />
-		<input id="autocomplete2" placeholder="Enter destination" onFocus="geolocate()" type="text" />
+		<input id="autocomplete" placeholder="Enter starting location" type="text" />
+		<input id="autocomplete2" placeholder="Enter destination" type="text" />
 	</form>
 
 	<table id="address">
@@ -117,7 +123,7 @@
 		function initialize()
 		{
 			initAutocomplete();
-			initMap();
+			geolocate();
 
 		}
 
@@ -148,6 +154,28 @@
 			// Get the place details from the autocomplete object.
 			var place = autocomplete.getPlace();
 			var place2 = autocomplete2.getPlace();
+
+			if (place !== undefined)
+			{
+				let placeLocation = {
+					lat: place.geometry.location.lat(),
+					lng: place.geometry.location.lng()
+				}
+				map.setZoom(10);
+				map.panTo(placeLocation);
+				let marker = new google.maps.Marker({ position: placeLocation, map: map });
+			}
+			if (place2 !== undefined)
+			{
+				let placeLocation = {
+					lat: place2.geometry.location.lat(),
+					lng: place2.geometry.location.lng()
+				}
+				map.setZoom(20);
+				map.panTo(placeLocation);
+				let marker = new google.maps.Marker({ position: placeLocation, map: map });
+			}
+
 
 			for (var component in componentForm)
 			{
@@ -181,7 +209,7 @@
 						lng: position.coords.longitude
 					};
 					initMap(geolocation);
-					console.log(geolocation);
+					// console.log(geolocation);
 					var circle = new google.maps.Circle({
 						center: geolocation,
 						radius: position.coords.accuracy
@@ -190,6 +218,7 @@
 				});
 			}
 		}
+
 		function initMap(geolocation)
 		{
 			let style = [
@@ -460,6 +489,21 @@
 			map.setOptions({ styles: style });
 
 			let marker = new google.maps.Marker({ position: geolocation, map: map });
+			var flightPlanCoordinates = [
+				{ lat: 37.772, lng: -122.214 },
+				{ lat: 21.291, lng: -157.821 },
+				{ lat: -18.142, lng: 178.431 },
+				{ lat: -27.467, lng: 153.027 }
+			];
+			var flightPath = new google.maps.Polyline({
+				path: flightPlanCoordinates,
+				geodesic: true,
+				strokeColor: '#FF0000',
+				strokeOpacity: 1.0,
+				strokeWeight: 2
+			});
+
+			flightPath.setMap(map);
 		}
 
 		function setNewMarker(position, map)
