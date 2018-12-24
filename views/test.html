@@ -70,9 +70,10 @@
 <body>
 	<h1>Sreet View Compiler</h1>
 	<div id="map"></div>
-	<form action="" method="post">
+	<form action="route" method="get">
 		<input id="autocomplete" placeholder="Enter starting location" type="text" />
 		<input id="autocomplete2" placeholder="Enter destination" type="text" />
+		<input type="submit" value="Submit">
 	</form>
 
 	<table id="address">
@@ -102,6 +103,13 @@
 	</table>
 
 	<script>
+
+		// const userAction = async () =>
+		// {
+		// 	const response = await fetch('loalhost:5000/api/route/');
+		// 	const myJson = await response.json();
+		// 	console.log(myJson);
+		// }
 		// This example displays an address form, using the autocomplete feature
 		// of the Google Places API to help users fill in the information.
 
