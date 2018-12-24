@@ -70,11 +70,11 @@
 <body>
 	<h1>Sreet View Compiler</h1>
 	<div id="map"></div>
-	<!-- <form action="" method="GET"> -->
-	<!-- <input id="autocomplete" placeholder="Enter starting location" type="text" />
-		<input id="autocomplete2" placeholder="Enter destination" type="text" /> -->
-	<input type="submit" value="Submit" onclick="fetchPosition()">
-	<!-- </form> -->
+	<form>
+		<input id="autocomplete" placeholder="Enter starting location" type="text" />
+		<input id="autocomplete2" placeholder="Enter destination" type="text" />
+	</form>
+	<input type="button" value="Submit" onclick="fetchPosition()">
 
 	<table id="address">
 		<tr>
@@ -103,38 +103,6 @@
 	</table>
 
 	<script>
-		function fetchPosition()
-		{
-			// fetch('/api/route').then(resp =>
-			// {
-			// 	resp.json().then(json =>
-			// 	{
-			// 		let data = json;
-			// 		console.log(data);
-			// 	});
-			// });
-
-			fetch("http://localhost:5000/api/route")
-				.then(res => res.json())
-				.then(route =>
-				{
-					// console.log(route)
-
-					var path = new google.maps.Polyline({
-						path: route["routes"],
-						geodesic: true,
-						strokeColor: '#FF0000',
-						strokeOpacity: 1.0,
-						strokeWeight: 2
-					});
-
-					path.setMap(map);
-				})
-				.catch(error =>
-				{
-					alert('Could not connect to database. Please Refresh.');
-				});
-		}
 
 		// const userAction = async () =>
 		// {
@@ -164,8 +132,89 @@
 		{
 			initAutocomplete();
 			geolocate();
-
 		}
+
+		function fetchPosition()
+		{
+			fetch("http://localhost:5000/api/route")
+				.then(res => res.json())
+				.then(poly =>
+				{
+
+					// console.log(route);
+					// let meow = decode("eir~FdezuOzeE|dB`jHb}]fiJb{ZxgJrnWhgG||NzeHpv@`dOdpE|jPsKjrUjoAtpc@v|e@zsHnbIjlItpMtqMn~Jp|GdcNpsZ|sJreRztLjqTf{Wnl@fjQ~tLls@~}K`hD|xFpkHl{Nx_SzjMpuOhkEfcWpxRzbD`hIthIhrSr`Qri\v~AboChjFnpJbC`il@tFbp^qLhuSbuElzRpkNz{Mm`@d~YbjSrl]~dP~zPdxn@OxkQ|`G|iPbuMbxk@tx@z~X~iEvxX|~Qj`U|aQxuXnuXbn_@juUxwu@xcHbyc@nbF~mKea@zyUrsFvgLluGpaMbfObmp@bxFlmt@x{a@jfe@joYjqQduUf|PlmEfrMtzCjdr@rdHhiRhaBval@ldUtwo@eq@xnxAiJriVPppE|nDvqA|tG|xDfzAlaMfnRbxf@nx`@nrT~uU|ip@xcS~iQjc\pgb@znOzaa@n~Sd_WttCnlSbcHd`L|dEbb[puk@`ahAntMhgj@~fLridAddPz|kA`yQp`HfeGhkE`CrtBtIdpd@e|Fnhg@iyDr_o@aa@zg`B~|En`x@tnDx}b@zyGxsNnc@zqQj}EjfSnHteSrqGbuM`wKfdFvdH~gz@fFz~w@bTv`sAvgGbe`AwdD|il@ysA|lp@~bDlolAfTxvi@iuGx{`AeuEpqq@tdLhsp@bsPficAelH`r`@{fArl^`bBxwZtsFhoS~gIlsnAlfVfnhAugFvp{AafCrvsBkJt}f@gvCdvb@w`Mvzb@vUnfMpnExiJcfFbx]{NznW`wWneqAq{Adu\m_Gl_Kpp@`|M}fF|aTtF`w_@gdLbf[mgI~fKauVvjPwtGpzCc~DjtRaeMv|q@s_Kr``@{}Bx|a@n~G`ba@h|Tt_YnnQrx\h{AnaPjmIllLnkYhokAbzOtqm@pqC~uWvsFdbFblBxdSwgJted@ioF~`g@cdI~w`@}dMl`jAsxLzbq@kkAjyZl~Ep`Iq[jtJgpHb`UcrCboWpYnls@tzDpiOhg@vjZysLfbgAudFxmRbqBbyRpaF|j\jzMjkg@v_Ab~UzcCbqi@{iJbsz@fhFrhM~nOxbHr_h@v~DpgObYv~L`}WftAnfh@kgItyOghP`mI_yCxyR~_Cv{Vv`InocA`iEh`n@hnHxt[bu@fah@Gpoc@iSr_h@o_K|bl@yiR~akBxxBjoQduYj~SdsTbtH|fc@l{YflUpkSruMegHlrHmdAj`JdeWziBttg@{G|tXhmAxvQbjGz{B_i@r{HzhBrq[zRrxG");
+					// console.log(meow);
+					let pt = decode(poly.polyline)
+					console.log(pt);
+					let path = new google.maps.Polyline({
+						// path: poly["routes"],
+						path: pt,
+						// path: decode(poly.polyline),
+						geodesic: true,
+						strokeColor: '#FF0000',
+						strokeOpacity: 1.0,
+						strokeWeight: 2
+					});
+					path.setMap(map);
+				})
+				.catch(error =>
+				{
+					alert('Could not connect to database. Please Refresh.');
+				});
+		}
+
+		function decode(str, precision)
+		{
+			var index = 0,
+				lat = 0,
+				lng = 0,
+				coordinates = [],
+				shift = 0,
+				result = 0,
+				byte = null,
+				latitude_change,
+				longitude_change,
+				factor = Math.pow(10, precision || 5);
+
+			// Coordinates have variable length when encoded, so just keep
+			// track of whether we've hit the end of the string. In each
+			// loop iteration, a single coordinate is decoded.
+			while (index < str.length)
+			{
+
+				// Reset shift, result, and byte
+				byte = null;
+				shift = 0;
+				result = 0;
+
+				do
+				{
+					byte = str.charCodeAt(index++) - 63;
+					result |= (byte & 0x1f) << shift;
+					shift += 5;
+				} while (byte >= 0x20);
+
+				latitude_change = ((result & 1) ? ~(result >> 1) : (result >> 1));
+
+				shift = result = 0;
+
+				do
+				{
+					byte = str.charCodeAt(index++) - 63;
+					result |= (byte & 0x1f) << shift;
+					shift += 5;
+				} while (byte >= 0x20);
+
+				longitude_change = ((result & 1) ? ~(result >> 1) : (result >> 1));
+
+				lat += latitude_change;
+				lng += longitude_change;
+
+				coordinates.push({ lat: lat / factor, lng: lng / factor });
+			}
+
+			return coordinates;
+		};
 
 		function initAutocomplete()
 		{
