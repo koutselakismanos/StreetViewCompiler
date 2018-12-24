@@ -64,6 +64,11 @@
 			height: 20px;
 			margin-bottom: 2px;
 		}
+
+		img{
+			width: 50%;
+			height: 50%;
+		}
 	</style>
 </head>
 
@@ -101,6 +106,8 @@
 			<td class="wideField" colspan="3"><input class="field" id="country" disabled="true" /></td>
 		</tr>
 	</table>
+	<img id="imagee" src="" alt="Smiley face" height="42" width="42">
+
 
 	<script>
 
@@ -144,8 +151,14 @@
 					// console.log(route);
 					// let meow = decode("eir~FdezuOzeE|dB`jHb}]fiJb{ZxgJrnWhgG||NzeHpv@`dOdpE|jPsKjrUjoAtpc@v|e@zsHnbIjlItpMtqMn~Jp|GdcNpsZ|sJreRztLjqTf{Wnl@fjQ~tLls@~}K`hD|xFpkHl{Nx_SzjMpuOhkEfcWpxRzbD`hIthIhrSr`Qri\v~AboChjFnpJbC`il@tFbp^qLhuSbuElzRpkNz{Mm`@d~YbjSrl]~dP~zPdxn@OxkQ|`G|iPbuMbxk@tx@z~X~iEvxX|~Qj`U|aQxuXnuXbn_@juUxwu@xcHbyc@nbF~mKea@zyUrsFvgLluGpaMbfObmp@bxFlmt@x{a@jfe@joYjqQduUf|PlmEfrMtzCjdr@rdHhiRhaBval@ldUtwo@eq@xnxAiJriVPppE|nDvqA|tG|xDfzAlaMfnRbxf@nx`@nrT~uU|ip@xcS~iQjc\pgb@znOzaa@n~Sd_WttCnlSbcHd`L|dEbb[puk@`ahAntMhgj@~fLridAddPz|kA`yQp`HfeGhkE`CrtBtIdpd@e|Fnhg@iyDr_o@aa@zg`B~|En`x@tnDx}b@zyGxsNnc@zqQj}EjfSnHteSrqGbuM`wKfdFvdH~gz@fFz~w@bTv`sAvgGbe`AwdD|il@ysA|lp@~bDlolAfTxvi@iuGx{`AeuEpqq@tdLhsp@bsPficAelH`r`@{fArl^`bBxwZtsFhoS~gIlsnAlfVfnhAugFvp{AafCrvsBkJt}f@gvCdvb@w`Mvzb@vUnfMpnExiJcfFbx]{NznW`wWneqAq{Adu\m_Gl_Kpp@`|M}fF|aTtF`w_@gdLbf[mgI~fKauVvjPwtGpzCc~DjtRaeMv|q@s_Kr``@{}Bx|a@n~G`ba@h|Tt_YnnQrx\h{AnaPjmIllLnkYhokAbzOtqm@pqC~uWvsFdbFblBxdSwgJted@ioF~`g@cdI~w`@}dMl`jAsxLzbq@kkAjyZl~Ep`Iq[jtJgpHb`UcrCboWpYnls@tzDpiOhg@vjZysLfbgAudFxmRbqBbyRpaF|j\jzMjkg@v_Ab~UzcCbqi@{iJbsz@fhFrhM~nOxbHr_h@v~DpgObYv~L`}WftAnfh@kgItyOghP`mI_yCxyR~_Cv{Vv`InocA`iEh`n@hnHxt[bu@fah@Gpoc@iSr_h@o_K|bl@yiR~akBxxBjoQduYj~SdsTbtH|fc@l{YflUpkSruMegHlrHmdAj`JdeWziBttg@{G|tXhmAxvQbjGz{B_i@r{HzhBrq[zRrxG");
 					// console.log(meow);
-					let pt = decode(poly.polyline)
-					console.log(pt);
+					let pt = poly.polyline;
+					let imgUrl = "https://maps.googleapis.com/maps/api/streetview?size=1200x720&location=";
+					let elseUrl = "&heading=151.78&pitch=-0.76&key=AIzaSyDM1Md63YaQY-nPkpoK60q8S8MJ_2pjFgc";
+					let currentPos = 25;
+					imgUrl = imgUrl + pt[currentPos].lat + ',' + pt[currentPos].lng + elseUrl;
+					console.log(imgUrl);
+					document.getElementById("imagee").src = imgUrl;
+					// console.log(pt[0].lat);
 					let path = new google.maps.Polyline({
 						// path: poly["routes"],
 						path: pt,
@@ -156,6 +169,7 @@
 						strokeWeight: 2
 					});
 					path.setMap(map);
+
 				})
 				.catch(error =>
 				{
@@ -574,7 +588,7 @@
 				}
 			]
 
-			map = new google.maps.Map(document.getElementById('map'), { zoom: 4, center: geolocation, streetViewControl: false, mapTypeControl: false });
+			map = new google.maps.Map(document.getElementById('map'), { zoom: 4, center: geolocation, streetViewControl: true, mapTypeControl: false });
 			map.setOptions({ styles: style });
 
 			let marker = new google.maps.Marker({ position: geolocation, map: map });

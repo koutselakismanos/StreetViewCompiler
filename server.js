@@ -22,36 +22,36 @@ app.get('/api/route/', (req, response) =>
 			if (err) throw err;
 			let positions = {
 				routes: [],
-				polyline: ""
+				polyline: []
 			};
 			let snapUrl = "https://roads.googleapis.com/v1/snapToRoads?path="
 			json.routes[0].legs.filter(leg => Object.getOwnPropertyNames(leg).includes("steps"))
 				.forEach(leg => leg['steps'].forEach(step =>
 				{
 					// console.log(step.start_location);
-					positions.routes.push(step.start_location);
-					positions.routes.push(step.end_location);
-					positions.polyline += step.polyline.points;
+					// positions.routes.push(step.start_location);
+					// positions.routes.push(step.end_location);
+					positions.polyline.push(...decode(step.polyline.points));
 				}));
 			// positions.polyline += json.routes[0].overview_polyline.points;
 
-			let meow = decode(json.routes[0].overview_polyline.points);
-			meow.forEach((element, i) =>
-			{
-				if (i < 100)
-					snapUrl += `${element.lat},${element.lng}|`
-			})
-			snapUrl = snapUrl.substring(0, snapUrl.length - 1);
-			snapUrl += "&interpolate=true&key=AIzaSyDM1Md63YaQY-nPkpoK60q8S8MJ_2pjFgc"
-			console.log(snapUrl);
-			request({
-				url: snapUrl,
-				json: true
-			}, (err, res, json) =>
-				{
-					if (err) throw err;
-					console.log(json);
-				})
+			// let meow = decode(json.routes[0].overview_polyline.points);
+			// meow.forEach((element, i) =>
+			// {
+			// 	if (i < 100)
+			// 		snapUrl += `${element.lat},${element.lng}|`
+			// })
+			// snapUrl = snapUrl.substring(0, snapUrl.length - 1);
+			// snapUrl += "&interpolate=true&key=AIzaSyDM1Md63YaQY-nPkpoK60q8S8MJ_2pjFgc"
+			// console.log(snapUrl);
+			// request({
+			// 	url: snapUrl,
+			// 	json: true
+			// }, (err, res, json) =>
+			// 	{
+			// 		if (err) throw err;
+			// 		console.log(json);
+			// 	})
 			response.json(positions);
 			// console.log(positions);
 			// 	.forEach(element =>
