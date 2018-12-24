@@ -14,14 +14,14 @@ app.get('/api/', (req, res) =>
 
 app.get('/api/route/', (req, response) =>
 {
-	let positions = {
-		routes: []
-	};
 	request({
 		url: "https://maps.googleapis.com/maps/api/directions/json?origin=Chicago,IL&destination=Los+Angeles,CA&waypoints=Joplin,MO|Oklahoma+City,OK&key=AIzaSyDM1Md63YaQY-nPkpoK60q8S8MJ_2pjFgc",
 		json: true
 	}, (err, res, json) =>
 		{
+			let positions = {
+				routes: []
+			};
 			if (err) throw err;
 			json.routes[0].legs.filter(leg => Object.getOwnPropertyNames(leg).includes("steps"))
 				.forEach(leg => leg['steps'].forEach(step =>

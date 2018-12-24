@@ -70,11 +70,11 @@
 <body>
 	<h1>Sreet View Compiler</h1>
 	<div id="map"></div>
-	<form action="route" method="get">
-		<input id="autocomplete" placeholder="Enter starting location" type="text" />
-		<input id="autocomplete2" placeholder="Enter destination" type="text" />
-		<input type="submit" value="Submit">
-	</form>
+	<!-- <form action="" method="GET"> -->
+	<!-- <input id="autocomplete" placeholder="Enter starting location" type="text" />
+		<input id="autocomplete2" placeholder="Enter destination" type="text" /> -->
+	<input type="submit" value="Submit" onclick="fetchPosition()">
+	<!-- </form> -->
 
 	<table id="address">
 		<tr>
@@ -103,6 +103,38 @@
 	</table>
 
 	<script>
+		function fetchPosition()
+		{
+			// fetch('/api/route').then(resp =>
+			// {
+			// 	resp.json().then(json =>
+			// 	{
+			// 		let data = json;
+			// 		console.log(data);
+			// 	});
+			// });
+
+			fetch("http://localhost:5000/api/route")
+				.then(res => res.json())
+				.then(route =>
+				{
+					// console.log(route)
+
+					var path = new google.maps.Polyline({
+						path: route["routes"],
+						geodesic: true,
+						strokeColor: '#FF0000',
+						strokeOpacity: 1.0,
+						strokeWeight: 2
+					});
+
+					path.setMap(map);
+				})
+				.catch(error =>
+				{
+					alert('Could not connect to database. Please Refresh.');
+				});
+		}
 
 		// const userAction = async () =>
 		// {
@@ -497,21 +529,21 @@
 			map.setOptions({ styles: style });
 
 			let marker = new google.maps.Marker({ position: geolocation, map: map });
-			var flightPlanCoordinates = [
-				{ lat: 37.772, lng: -122.214 },
-				{ lat: 21.291, lng: -157.821 },
-				{ lat: -18.142, lng: 178.431 },
-				{ lat: -27.467, lng: 153.027 }
-			];
-			var flightPath = new google.maps.Polyline({
-				path: flightPlanCoordinates,
-				geodesic: true,
-				strokeColor: '#FF0000',
-				strokeOpacity: 1.0,
-				strokeWeight: 2
-			});
+			// var flightPlanCoordinates = [
+			// 	{ lat: 37.772, lng: -122.214 },
+			// 	{ lat: 21.291, lng: -157.821 },
+			// 	{ lat: -18.142, lng: 178.431 },
+			// 	{ lat: -27.467, lng: 153.027 }
+			// ];
+			// var flightPath = new google.maps.Polyline({
+			// 	path: flightPlanCoordinates,
+			// 	geodesic: true,
+			// 	strokeColor: '#FF0000',
+			// 	strokeOpacity: 1.0,
+			// 	strokeWeight: 2
+			// });
 
-			flightPath.setMap(map);
+			// flightPath.setMap(map);
 		}
 
 		function setNewMarker(position, map)
