@@ -153,8 +153,8 @@
 					// console.log(meow);
 					let pt = poly.polyline;
 					let imgUrl = "https://maps.googleapis.com/maps/api/streetview?size=1200x720&location=";
-					let elseUrl = "&heading=151.78&pitch=-0.76&key=AIzaSyDM1Md63YaQY-nPkpoK60q8S8MJ_2pjFgc";
-					let currentPos = 25;
+					let elseUrl = "&heading=261.78&key=AIzaSyDM1Md63YaQY-nPkpoK60q8S8MJ_2pjFgc";
+					let currentPos = 23;
 					imgUrl = imgUrl + pt[currentPos].lat + ',' + pt[currentPos].lng + elseUrl;
 					console.log(imgUrl);
 					document.getElementById("imagee").src = imgUrl;
@@ -264,7 +264,7 @@
 					lat: place.geometry.location.lat(),
 					lng: place.geometry.location.lng()
 				}
-				map.setZoom(10);
+				map.setZoom(16);
 				map.panTo(placeLocation);
 				let marker = new google.maps.Marker({ position: placeLocation, map: map });
 			}
@@ -274,11 +274,27 @@
 					lat: place2.geometry.location.lat(),
 					lng: place2.geometry.location.lng()
 				}
-				map.setZoom(20);
+				map.setZoom(16);
 				map.panTo(placeLocation);
 				let marker = new google.maps.Marker({ position: placeLocation, map: map });
 			}
 
+			if (place2 !== undefined && place2 !== undefined)
+			{
+				let place1Loc = {
+					lat: place.geometry.location.lat(),
+					lng: place.geometry.location.lng()
+				}
+				let place2Loc = {
+					lat: place2.geometry.location.lat(),
+					lng: place2.geometry.location.lng()
+				}
+
+
+				map.panTo({ lat: (place1Loc.lat + place2Loc.lat) / 2, lng: (place1Loc.lng + place2Loc.lng) / 2 });
+
+
+			}
 
 			for (var component in componentForm)
 			{
