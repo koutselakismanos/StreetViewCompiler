@@ -75,11 +75,10 @@
 <body>
 	<h1>Sreet View Compiler</h1>
 	<div id="map"></div>
-	<form>
+	<form action="#">
 		<input id="autocomplete" placeholder="Enter starting location" type="text" />
 		<input id="autocomplete2" placeholder="Enter destination" type="text" />
 	</form>
-	<input type="button" value="Submit" onclick="fetchPosition()">
 
 	<table id="address">
 		<tr>
@@ -141,8 +140,23 @@
 			geolocate();
 		}
 
-		function fetchPosition()
+		async function fetchPosition(value1, value2)
 		{
+			// let value1 = document.getElementById("autocomplete").value;
+			// let value2 = document.getElementById("autocomplete2").value;
+			// console.log(value1, value2);
+			fetch("http://localhost:5000/api/log", {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					value1: `${value1.lat},${value1.lng}`,
+					value2: `${value2.lat},${value2.lng}`,
+				}),
+			});
+			// .then(res => res.json())
+			// 	.then(response => console.log('Success: ', JSON.stringify(response)));
 			fetch("http://localhost:5000/api/route")
 				.then(res => res.json())
 				.then(poly =>
@@ -154,7 +168,7 @@
 					let pt = poly.polyline;
 					let imgUrl = "https://maps.googleapis.com/maps/api/streetview?size=1200x720&location=";
 					let elseUrl = "&heading=261.78&key=AIzaSyDM1Md63YaQY-nPkpoK60q8S8MJ_2pjFgc";
-					let currentPos = 23;
+					let currentPos = 0;
 					imgUrl = imgUrl + pt[currentPos].lat + ',' + pt[currentPos].lng + elseUrl;
 					console.log(imgUrl);
 					document.getElementById("imagee").src = imgUrl;
@@ -166,7 +180,7 @@
 						geodesic: true,
 						strokeColor: '#FF0000',
 						strokeOpacity: 1.0,
-						strokeWeight: 2
+						strokeWeight: 5
 					});
 					path.setMap(map);
 
@@ -291,7 +305,15 @@
 				}
 
 
-				map.panTo({ lat: (place1Loc.lat + place2Loc.lat) / 2, lng: (place1Loc.lng + place2Loc.lng) / 2 });
+				fetchPosition(place1Loc, place2Loc);
+				// map.fitBounds();
+				let bounds = new google.maps.LatLngBounds();
+				// console.log(bounds);
+				bounds.extend(place1Loc);
+				bounds.extend(place2Loc);
+				map.fitBounds(bounds);
+				// map.setCenter(bounds.getCenter());
+				// map.panTo({ lat: (place1Loc.lat + place2Loc.lat) / 2, lng: (place1Loc.lng + place2Loc.lng) / 2 });
 
 
 			}

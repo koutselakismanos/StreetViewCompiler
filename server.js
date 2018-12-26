@@ -1,11 +1,15 @@
 const express = require('express');
 const morgan = require('morgan');
 const request = require('request');
+const bodyParser = require('body-parser');
 
 const app = express();
 const port = 5000;
+let url;
 
 app.use(morgan('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/api/', (req, res) =>
 {
@@ -14,8 +18,9 @@ app.get('/api/', (req, res) =>
 
 app.get('/api/route/', (req, response) =>
 {
+	console.log(url);
 	request({
-		url: "https://maps.googleapis.com/maps/api/directions/json?&moe=transit&origin=Chicago,IL&destination=Los+Angeles,CA&waypoints=Joplin,MO|Oklahoma+City,OK&key=AIzaSyDM1Md63YaQY-nPkpoK60q8S8MJ_2pjFgc",
+		url,
 		json: true
 	}, (err, res, json) =>
 		{
@@ -62,6 +67,32 @@ app.get('/api/route/', (req, response) =>
 		})
 
 	// console.log(positions);
+});
+
+app.post('/api/log', (req, response) =>
+{
+	console.log(req.body.value1, req.body.value2);
+	url = `https://maps.googleapis.com/maps/api/directions/json?&origin=${req.body.value1.split(" ").join("+")}&destination=${req.body.value2.split(" ").join("+")}&key=AIzaSyDM1Md63YaQY-nPkpoK60q8S8MJ_2pjFgc`;
+
+	console.log(url)
+	// request({
+	// 	url,
+	// 	json: true
+	// }, (err, res, json) =>
+	// 	{
+	// 		if (err) throw err;
+	// 		let positions = {
+	// 			routes: [],
+	// 			polyline: []
+	// 		};
+	// 		// let snapUrl = "https://roads.googleapis.com/v1/snapToRoads?path="
+	// 		json.routes[0].legs.filter(leg => Object.getOwnPropertyNames(leg).includes("steps"))
+	// 			.forEach(leg => leg['steps'].forEach(step =>
+	// 			{
+	// 				positions.polyline.push(...decode(step.polyline.points));
+	// 			}));
+	// 		response.json(positions);
+	// 	})
 });
 
 
@@ -118,4 +149,4 @@ function decode(str, precision)
 	return coordinates;
 };
 
-app.listen(port, () => { console.log(`Server started on port ${port}`); });
+app.listen(port, '0.0.0.0', () => { console.log(`Server started on port ${port}`); });
