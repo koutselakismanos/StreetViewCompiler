@@ -39,7 +39,6 @@ app.get('/api/route/', (req, response) =>
 					positions.polyline.push(...decode(step.polyline.points));
 				}));
 			// positions.polyline += json.routes[0].overview_polyline.points;
-
 			// let meow = decode(json.routes[0].overview_polyline.points);
 			// meow.forEach((element, i) =>
 			// {
