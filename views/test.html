@@ -2,12 +2,12 @@
 <html>
 
 <head>
-	<meta charset="utf-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Street View Compiler</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<style>
-		#map {
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Street View Compiler</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        #map {
 			height: 800px;
 			width: 100%;
 			background-color: lightgray;
@@ -73,587 +73,588 @@
 </head>
 
 <body>
-	<h1>Sreet View Compiler</h1>
-	<div id="map"></div>
-	<form action="#">
-		<input id="autocomplete" placeholder="Enter starting location" type="text" />
-		<input id="autocomplete2" placeholder="Enter destination" type="text" />
-	</form>
+    <h1>Sreet View Compiler</h1>
+    <div id="map"></div>
+    <form action="#">
+        <input id="autocomplete" placeholder="Enter starting location" type="text" />
+        <input id="autocomplete2" placeholder="Enter destination" type="text" />
+    </form>
 
-	<table id="address">
-		<tr>
-			<td class="label">Street address</td>
-			<td class="slimField"><input class="field" id="street_number" disabled="true" /></td>
-			<td class="wideField" colspan="2"><input class="field" id="route" disabled="true" /></td>
-		</tr>
-		<tr>
-			<td class="label">City</td>
-			<!-- Note: Selection of address components in this example is typical.
+    <table id="address">
+        <tr>
+            <td class="label">Street address</td>
+            <td class="slimField"><input class="field" id="street_number" disabled="true" /></td>
+            <td class="wideField" colspan="2"><input class="field" id="route" disabled="true" /></td>
+        </tr>
+        <tr>
+            <td class="label">City</td>
+            <!-- Note: Selection of address components in this example is typical.
 				   You may need to adjust it for the locations relevant to your app. See
 				   https://developers.google.com/maps/documentation/javascript/examples/places-autocomplete-addressform
 			  -->
-			<td class="wideField" colspan="3"><input class="field" id="locality" disabled="true" /></td>
-		</tr>
-		<tr>
-			<td class="label">State</td>
-			<td class="slimField"><input class="field" id="administrative_area_level_1" disabled="true" /></td>
-			<td class="label">Zip code</td>
-			<td class="wideField"><input class="field" id="postal_code" disabled="true" /></td>
-		</tr>
-		<tr>
-			<td class="label">Country</td>
-			<td class="wideField" colspan="3"><input class="field" id="country" disabled="true" /></td>
-		</tr>
-	</table>
-	<img id="imagee" src="" alt="Smiley face" height="42" width="42">
+            <td class="wideField" colspan="3"><input class="field" id="locality" disabled="true" /></td>
+        </tr>
+        <tr>
+            <td class="label">State</td>
+            <td class="slimField"><input class="field" id="administrative_area_level_1" disabled="true" /></td>
+            <td class="label">Zip code</td>
+            <td class="wideField"><input class="field" id="postal_code" disabled="true" /></td>
+        </tr>
+        <tr>
+            <td class="label">Country</td>
+            <td class="wideField" colspan="3"><input class="field" id="country" disabled="true" /></td>
+        </tr>
+    </table>
+    <img id="imagee" src="" alt="Smiley face" height="42" width="42">
+    <iframe id="iframee" src="" frameborder="0"></iframe>
 
 
-	<script>
+    <script>
 
-		// const userAction = async () =>
-		// {
-		// 	const response = await fetch('loalhost:5000/api/route/');
-		// 	const myJson = await response.json();
-		// 	console.log(myJson);
-		// }
-		// This example displays an address form, using the autocomplete feature
-		// of the Google Places API to help users fill in the information.
+        // const userAction = async () =>
+        // {
+        // 	const response = await fetch('loalhost:5000/api/route/');
+        // 	const myJson = await response.json();
+        // 	console.log(myJson);
+        // }
+        // This example displays an address form, using the autocomplete feature
+        // of the Google Places API to help users fill in the information.
 
-		// This example requires the Places library. Include the libraries=places
-		// parameter when you first load the API. For example:
-		// <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
+        // This example requires the Places library. Include the libraries=places
+        // parameter when you first load the API. For example:
+        // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
 
-		let map;
-		var placeSearch, autocomplete, autocomplete2;
-		var componentForm = {
-			street_number: 'short_name',
-			route: 'long_name',
-			locality: 'long_name',
-			administrative_area_level_1: 'short_name',
-			country: 'long_name',
-			postal_code: 'short_name'
-		};
+        let map;
+        var placeSearch, autocomplete, autocomplete2;
+        var componentForm = {
+            street_number: 'short_name',
+            route: 'long_name',
+            locality: 'long_name',
+            administrative_area_level_1: 'short_name',
+            country: 'long_name',
+            postal_code: 'short_name'
+        };
 
-		function initialize()
-		{
-			initAutocomplete();
-			geolocate();
-		}
+        function initialize()
+        {
+            initAutocomplete();
+            geolocate();
+        }
 
-		async function fetchPosition(value1, value2)
-		{
-			// let value1 = document.getElementById("autocomplete").value;
-			// let value2 = document.getElementById("autocomplete2").value;
-			// console.log(value1, value2);
-			fetch("http://localhost:5000/api/log", {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					value1: `${value1.lat},${value1.lng}`,
-					value2: `${value2.lat},${value2.lng}`,
-				}),
-			});
-			// .then(res => res.json())
-			// 	.then(response => console.log('Success: ', JSON.stringify(response)));
-			fetch("http://localhost:5000/api/route")
-				.then(res => res.json())
-				.then(poly =>
-				{
+        async function fetchPosition(value1, value2)
+        {
+            // let value1 = document.getElementById("autocomplete").value;
+            // let value2 = document.getElementById("autocomplete2").value;
+            // console.log(value1, value2);
+            fetch("http://localhost:5000/api/log", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    value1: `${value1.lat},${value1.lng}`,
+                    value2: `${value2.lat},${value2.lng}`,
+                }),
+            });
+            // .then(res => res.json())
+            // 	.then(response => console.log('Success: ', JSON.stringify(response)));
+            fetch("http://localhost:5000/api/route")
+                .then(res => res.json())
+                .then(poly =>
+                {
 
-					// console.log(route);
-					// let meow = decode("eir~FdezuOzeE|dB`jHb}]fiJb{ZxgJrnWhgG||NzeHpv@`dOdpE|jPsKjrUjoAtpc@v|e@zsHnbIjlItpMtqMn~Jp|GdcNpsZ|sJreRztLjqTf{Wnl@fjQ~tLls@~}K`hD|xFpkHl{Nx_SzjMpuOhkEfcWpxRzbD`hIthIhrSr`Qri\v~AboChjFnpJbC`il@tFbp^qLhuSbuElzRpkNz{Mm`@d~YbjSrl]~dP~zPdxn@OxkQ|`G|iPbuMbxk@tx@z~X~iEvxX|~Qj`U|aQxuXnuXbn_@juUxwu@xcHbyc@nbF~mKea@zyUrsFvgLluGpaMbfObmp@bxFlmt@x{a@jfe@joYjqQduUf|PlmEfrMtzCjdr@rdHhiRhaBval@ldUtwo@eq@xnxAiJriVPppE|nDvqA|tG|xDfzAlaMfnRbxf@nx`@nrT~uU|ip@xcS~iQjc\pgb@znOzaa@n~Sd_WttCnlSbcHd`L|dEbb[puk@`ahAntMhgj@~fLridAddPz|kA`yQp`HfeGhkE`CrtBtIdpd@e|Fnhg@iyDr_o@aa@zg`B~|En`x@tnDx}b@zyGxsNnc@zqQj}EjfSnHteSrqGbuM`wKfdFvdH~gz@fFz~w@bTv`sAvgGbe`AwdD|il@ysA|lp@~bDlolAfTxvi@iuGx{`AeuEpqq@tdLhsp@bsPficAelH`r`@{fArl^`bBxwZtsFhoS~gIlsnAlfVfnhAugFvp{AafCrvsBkJt}f@gvCdvb@w`Mvzb@vUnfMpnExiJcfFbx]{NznW`wWneqAq{Adu\m_Gl_Kpp@`|M}fF|aTtF`w_@gdLbf[mgI~fKauVvjPwtGpzCc~DjtRaeMv|q@s_Kr``@{}Bx|a@n~G`ba@h|Tt_YnnQrx\h{AnaPjmIllLnkYhokAbzOtqm@pqC~uWvsFdbFblBxdSwgJted@ioF~`g@cdI~w`@}dMl`jAsxLzbq@kkAjyZl~Ep`Iq[jtJgpHb`UcrCboWpYnls@tzDpiOhg@vjZysLfbgAudFxmRbqBbyRpaF|j\jzMjkg@v_Ab~UzcCbqi@{iJbsz@fhFrhM~nOxbHr_h@v~DpgObYv~L`}WftAnfh@kgItyOghP`mI_yCxyR~_Cv{Vv`InocA`iEh`n@hnHxt[bu@fah@Gpoc@iSr_h@o_K|bl@yiR~akBxxBjoQduYj~SdsTbtH|fc@l{YflUpkSruMegHlrHmdAj`JdeWziBttg@{G|tXhmAxvQbjGz{B_i@r{HzhBrq[zRrxG");
-					// console.log(meow);
-					let pt = poly.polyline;
-					let imgUrl = "https://maps.googleapis.com/maps/api/streetview?size=1200x720&location=";
-					let elseUrl = "&heading=261.78&key=AIzaSyDM1Md63YaQY-nPkpoK60q8S8MJ_2pjFgc";
-					let currentPos = 0;
-					imgUrl = imgUrl + pt[currentPos].lat + ',' + pt[currentPos].lng + elseUrl;
-					console.log(imgUrl);
-					document.getElementById("imagee").src = imgUrl;
-					// console.log(pt[0].lat);
-					let path = new google.maps.Polyline({
-						// path: poly["routes"],
-						path: pt,
-						// path: decode(poly.polyline),
-						geodesic: true,
-						strokeColor: '#FF0000',
-						strokeOpacity: 1.0,
-						strokeWeight: 5
-					});
-					path.setMap(map);
+                    // console.log(route);
+                    // let meow = decode("eir~FdezuOzeE|dB`jHb}]fiJb{ZxgJrnWhgG||NzeHpv@`dOdpE|jPsKjrUjoAtpc@v|e@zsHnbIjlItpMtqMn~Jp|GdcNpsZ|sJreRztLjqTf{Wnl@fjQ~tLls@~}K`hD|xFpkHl{Nx_SzjMpuOhkEfcWpxRzbD`hIthIhrSr`Qri\v~AboChjFnpJbC`il@tFbp^qLhuSbuElzRpkNz{Mm`@d~YbjSrl]~dP~zPdxn@OxkQ|`G|iPbuMbxk@tx@z~X~iEvxX|~Qj`U|aQxuXnuXbn_@juUxwu@xcHbyc@nbF~mKea@zyUrsFvgLluGpaMbfObmp@bxFlmt@x{a@jfe@joYjqQduUf|PlmEfrMtzCjdr@rdHhiRhaBval@ldUtwo@eq@xnxAiJriVPppE|nDvqA|tG|xDfzAlaMfnRbxf@nx`@nrT~uU|ip@xcS~iQjc\pgb@znOzaa@n~Sd_WttCnlSbcHd`L|dEbb[puk@`ahAntMhgj@~fLridAddPz|kA`yQp`HfeGhkE`CrtBtIdpd@e|Fnhg@iyDr_o@aa@zg`B~|En`x@tnDx}b@zyGxsNnc@zqQj}EjfSnHteSrqGbuM`wKfdFvdH~gz@fFz~w@bTv`sAvgGbe`AwdD|il@ysA|lp@~bDlolAfTxvi@iuGx{`AeuEpqq@tdLhsp@bsPficAelH`r`@{fArl^`bBxwZtsFhoS~gIlsnAlfVfnhAugFvp{AafCrvsBkJt}f@gvCdvb@w`Mvzb@vUnfMpnExiJcfFbx]{NznW`wWneqAq{Adu\m_Gl_Kpp@`|M}fF|aTtF`w_@gdLbf[mgI~fKauVvjPwtGpzCc~DjtRaeMv|q@s_Kr``@{}Bx|a@n~G`ba@h|Tt_YnnQrx\h{AnaPjmIllLnkYhokAbzOtqm@pqC~uWvsFdbFblBxdSwgJted@ioF~`g@cdI~w`@}dMl`jAsxLzbq@kkAjyZl~Ep`Iq[jtJgpHb`UcrCboWpYnls@tzDpiOhg@vjZysLfbgAudFxmRbqBbyRpaF|j\jzMjkg@v_Ab~UzcCbqi@{iJbsz@fhFrhM~nOxbHr_h@v~DpgObYv~L`}WftAnfh@kgItyOghP`mI_yCxyR~_Cv{Vv`InocA`iEh`n@hnHxt[bu@fah@Gpoc@iSr_h@o_K|bl@yiR~akBxxBjoQduYj~SdsTbtH|fc@l{YflUpkSruMegHlrHmdAj`JdeWziBttg@{G|tXhmAxvQbjGz{B_i@r{HzhBrq[zRrxG");
+                    // console.log(meow);
+                    let pt = poly.polyline;
+                    let imgUrl = "https://maps.googleapis.com/maps/api/streetview?size=1200x720&location=";
+                    let elseUrl = "&heading=161.78&key=AIzaSyDM1Md63YaQY-nPkpoK60q8S8MJ_2pjFgc";
+                    let currentPos = 0;
+                    imgUrl = imgUrl + pt[currentPos].lat + ',' + pt[currentPos].lng + elseUrl;
+                    console.log(imgUrl);
+                    document.getElementById("imagee").src = imgUrl;
+                    // console.log(pt[0].lat);
+                    let path = new google.maps.Polyline({
+                        // path: poly["routes"],
+                        path: pt,
+                        // path: decode(poly.polyline),
+                        geodesic: true,
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 1.0,
+                        strokeWeight: 5
+                    });
+                    path.setMap(map);
 
-				})
-				.catch(error =>
-				{
-					alert('Could not connect to database. Please Refresh.');
-				});
-		}
+                })
+                .catch(error =>
+                {
+                    alert('Could not connect to database. Please Refresh.');
+                });
+        }
 
-		function decode(str, precision)
-		{
-			var index = 0,
-				lat = 0,
-				lng = 0,
-				coordinates = [],
-				shift = 0,
-				result = 0,
-				byte = null,
-				latitude_change,
-				longitude_change,
-				factor = Math.pow(10, precision || 5);
+        function decode(str, precision)
+        {
+            var index = 0,
+                lat = 0,
+                lng = 0,
+                coordinates = [],
+                shift = 0,
+                result = 0,
+                byte = null,
+                latitude_change,
+                longitude_change,
+                factor = Math.pow(10, precision || 5);
 
-			// Coordinates have variable length when encoded, so just keep
-			// track of whether we've hit the end of the string. In each
-			// loop iteration, a single coordinate is decoded.
-			while (index < str.length)
-			{
+            // Coordinates have variable length when encoded, so just keep
+            // track of whether we've hit the end of the string. In each
+            // loop iteration, a single coordinate is decoded.
+            while (index < str.length)
+            {
 
-				// Reset shift, result, and byte
-				byte = null;
-				shift = 0;
-				result = 0;
+                // Reset shift, result, and byte
+                byte = null;
+                shift = 0;
+                result = 0;
 
-				do
-				{
-					byte = str.charCodeAt(index++) - 63;
-					result |= (byte & 0x1f) << shift;
-					shift += 5;
-				} while (byte >= 0x20);
+                do
+                {
+                    byte = str.charCodeAt(index++) - 63;
+                    result |= (byte & 0x1f) << shift;
+                    shift += 5;
+                } while (byte >= 0x20);
 
-				latitude_change = ((result & 1) ? ~(result >> 1) : (result >> 1));
+                latitude_change = ((result & 1) ? ~(result >> 1) : (result >> 1));
 
-				shift = result = 0;
+                shift = result = 0;
 
-				do
-				{
-					byte = str.charCodeAt(index++) - 63;
-					result |= (byte & 0x1f) << shift;
-					shift += 5;
-				} while (byte >= 0x20);
+                do
+                {
+                    byte = str.charCodeAt(index++) - 63;
+                    result |= (byte & 0x1f) << shift;
+                    shift += 5;
+                } while (byte >= 0x20);
 
-				longitude_change = ((result & 1) ? ~(result >> 1) : (result >> 1));
+                longitude_change = ((result & 1) ? ~(result >> 1) : (result >> 1));
 
-				lat += latitude_change;
-				lng += longitude_change;
+                lat += latitude_change;
+                lng += longitude_change;
 
-				coordinates.push({ lat: lat / factor, lng: lng / factor });
-			}
+                coordinates.push({ lat: lat / factor, lng: lng / factor });
+            }
 
-			return coordinates;
-		};
+            return coordinates;
+        };
 
-		function initAutocomplete()
-		{
-			// Create the autocomplete object, restricting the search to geographical
-			// location types.
-			autocomplete = new google.maps.places.Autocomplete(
+        function initAutocomplete()
+        {
+            // Create the autocomplete object, restricting the search to geographical
+            // location types.
+            autocomplete = new google.maps.places.Autocomplete(
 				  /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
-				{ types: ['geocode'] });
+                { types: ['geocode'] });
 
-			// When the user selects an address from the dropdown, populate the address
-			// fields in the form.
-			autocomplete.addListener('place_changed', fillInAddress);
+            // When the user selects an address from the dropdown, populate the address
+            // fields in the form.
+            autocomplete.addListener('place_changed', fillInAddress);
 
-			autocomplete2 = new google.maps.places.Autocomplete(
+            autocomplete2 = new google.maps.places.Autocomplete(
 				  /** @type {!HTMLInputElement} */(document.getElementById('autocomplete2')),
-				{ types: ['geocode'] });
+                { types: ['geocode'] });
 
-			// When the user selects an address from the dropdown, populate the address
-			// fields in the form.
-			autocomplete2.addListener('place_changed', fillInAddress);
+            // When the user selects an address from the dropdown, populate the address
+            // fields in the form.
+            autocomplete2.addListener('place_changed', fillInAddress);
 
-		}
+        }
 
-		function fillInAddress()
-		{
-			// Get the place details from the autocomplete object.
-			var place = autocomplete.getPlace();
-			var place2 = autocomplete2.getPlace();
+        function fillInAddress()
+        {
+            // Get the place details from the autocomplete object.
+            var place = autocomplete.getPlace();
+            var place2 = autocomplete2.getPlace();
 
-			if (place !== undefined)
-			{
-				let placeLocation = {
-					lat: place.geometry.location.lat(),
-					lng: place.geometry.location.lng()
-				}
-				map.setZoom(16);
-				map.panTo(placeLocation);
-				let marker = new google.maps.Marker({ position: placeLocation, map: map });
-			}
-			if (place2 !== undefined)
-			{
-				let placeLocation = {
-					lat: place2.geometry.location.lat(),
-					lng: place2.geometry.location.lng()
-				}
-				map.setZoom(16);
-				map.panTo(placeLocation);
-				let marker = new google.maps.Marker({ position: placeLocation, map: map });
-			}
+            if (place !== undefined)
+            {
+                let placeLocation = {
+                    lat: place.geometry.location.lat(),
+                    lng: place.geometry.location.lng()
+                }
+                map.setZoom(16);
+                map.panTo(placeLocation);
+                let marker = new google.maps.Marker({ position: placeLocation, map: map });
+            }
+            if (place2 !== undefined)
+            {
+                let placeLocation = {
+                    lat: place2.geometry.location.lat(),
+                    lng: place2.geometry.location.lng()
+                }
+                map.setZoom(16);
+                map.panTo(placeLocation);
+                let marker = new google.maps.Marker({ position: placeLocation, map: map });
+            }
 
-			if (place2 !== undefined && place2 !== undefined)
-			{
-				let place1Loc = {
-					lat: place.geometry.location.lat(),
-					lng: place.geometry.location.lng()
-				}
-				let place2Loc = {
-					lat: place2.geometry.location.lat(),
-					lng: place2.geometry.location.lng()
-				}
-
-
-				fetchPosition(place1Loc, place2Loc);
-				// map.fitBounds();
-				let bounds = new google.maps.LatLngBounds();
-				// console.log(bounds);
-				bounds.extend(place1Loc);
-				bounds.extend(place2Loc);
-				map.fitBounds(bounds);
-				// map.setCenter(bounds.getCenter());
-				// map.panTo({ lat: (place1Loc.lat + place2Loc.lat) / 2, lng: (place1Loc.lng + place2Loc.lng) / 2 });
+            if (place2 !== undefined && place2 !== undefined)
+            {
+                let place1Loc = {
+                    lat: place.geometry.location.lat(),
+                    lng: place.geometry.location.lng()
+                }
+                let place2Loc = {
+                    lat: place2.geometry.location.lat(),
+                    lng: place2.geometry.location.lng()
+                }
 
 
-			}
+                fetchPosition(place1Loc, place2Loc);
+                // map.fitBounds();
+                let bounds = new google.maps.LatLngBounds();
+                // console.log(bounds);
+                bounds.extend(place1Loc);
+                bounds.extend(place2Loc);
+                map.fitBounds(bounds);
+                // map.setCenter(bounds.getCenter());
+                // map.panTo({ lat: (place1Loc.lat + place2Loc.lat) / 2, lng: (place1Loc.lng + place2Loc.lng) / 2 });
 
-			for (var component in componentForm)
-			{
-				document.getElementById(component).value = '';
-				document.getElementById(component).disabled = false;
-			}
 
-			// Get each component of the address from the place details
-			// and fill the corresponding field on the form.
-			for (var i = 0; i < place.address_components.length; i++)
-			{
-				var addressType = place.address_components[i].types[0];
-				if (componentForm[addressType])
-				{
-					var val = place.address_components[i][componentForm[addressType]];
-					document.getElementById(addressType).value = val;
-				}
-			}
-		}
+            }
 
-		// Bias the autocomplete object to the user's geographical location,
-		// as supplied by the browser's 'navigator.geolocation' object.
-		function geolocate()
-		{
-			if (navigator.geolocation)
-			{
-				navigator.geolocation.getCurrentPosition(function (position)
-				{
-					var geolocation = {
-						lat: position.coords.latitude,
-						lng: position.coords.longitude
-					};
-					initMap(geolocation);
-					// console.log(geolocation);
-					var circle = new google.maps.Circle({
-						center: geolocation,
-						radius: position.coords.accuracy
-					});
-					autocomplete.setBounds(circle.getBounds());
-				});
-			}
-		}
+            for (var component in componentForm)
+            {
+                document.getElementById(component).value = '';
+                document.getElementById(component).disabled = false;
+            }
 
-		function initMap(geolocation)
-		{
-			let style = [
-				{
-					"featureType": "all",
-					"elementType": "labels",
-					"stylers": [
-						{
-							"visibility": "on"
-						}
-					]
-				},
-				{
-					"featureType": "all",
-					"elementType": "labels.text.fill",
-					"stylers": [
-						{
-							"saturation": 36
-						},
-						{
-							"color": "#000000"
-						},
-						{
-							"lightness": 40
-						}
-					]
-				},
-				{
-					"featureType": "all",
-					"elementType": "labels.text.stroke",
-					"stylers": [
-						{
-							"visibility": "on"
-						},
-						{
-							"color": "#000000"
-						},
-						{
-							"lightness": 16
-						}
-					]
-				},
-				{
-					"featureType": "all",
-					"elementType": "labels.icon",
-					"stylers": [
-						{
-							"visibility": "off"
-						}
-					]
-				},
-				{
-					"featureType": "administrative",
-					"elementType": "geometry.fill",
-					"stylers": [
-						{
-							"color": "#000000"
-						},
-						{
-							"lightness": 20
-						}
-					]
-				},
-				{
-					"featureType": "administrative",
-					"elementType": "geometry.stroke",
-					"stylers": [
-						{
-							"color": "#000000"
-						},
-						{
-							"lightness": 17
-						},
-						{
-							"weight": 1.2
-						}
-					]
-				},
-				{
-					"featureType": "administrative.country",
-					"elementType": "labels.text.fill",
-					"stylers": [
-						{
-							"color": "#e5c163"
-						}
-					]
-				},
-				{
-					"featureType": "administrative.locality",
-					"elementType": "labels.text.fill",
-					"stylers": [
-						{
-							"color": "#c4c4c4"
-						}
-					]
-				},
-				{
-					"featureType": "administrative.neighborhood",
-					"elementType": "labels.text.fill",
-					"stylers": [
-						{
-							"color": "#e5c163"
-						}
-					]
-				},
-				{
-					"featureType": "landscape",
-					"elementType": "geometry",
-					"stylers": [
-						{
-							"color": "#000000"
-						},
-						{
-							"lightness": 20
-						}
-					]
-				},
-				{
-					"featureType": "poi",
-					"elementType": "geometry",
-					"stylers": [
-						{
-							"color": "#000000"
-						},
-						{
-							"lightness": 21
-						},
-						{
-							"visibility": "on"
-						}
-					]
-				},
-				{
-					"featureType": "poi.business",
-					"elementType": "geometry",
-					"stylers": [
-						{
-							"visibility": "on"
-						}
-					]
-				},
-				{
-					"featureType": "road.highway",
-					"elementType": "geometry.fill",
-					"stylers": [
-						{
-							"color": "#e5c163"
-						},
-						{
-							"lightness": "0"
-						}
-					]
-				},
-				{
-					"featureType": "road.highway",
-					"elementType": "geometry.stroke",
-					"stylers": [
-						{
-							"visibility": "off"
-						}
-					]
-				},
-				{
-					"featureType": "road.highway",
-					"elementType": "labels.text.fill",
-					"stylers": [
-						{
-							"color": "#ffffff"
-						}
-					]
-				},
-				{
-					"featureType": "road.highway",
-					"elementType": "labels.text.stroke",
-					"stylers": [
-						{
-							"color": "#e5c163"
-						}
-					]
-				},
-				{
-					"featureType": "road.arterial",
-					"elementType": "geometry",
-					"stylers": [
-						{
-							"color": "#000000"
-						},
-						{
-							"lightness": 18
-						}
-					]
-				},
-				{
-					"featureType": "road.arterial",
-					"elementType": "geometry.fill",
-					"stylers": [
-						{
-							"color": "#575757"
-						}
-					]
-				},
-				{
-					"featureType": "road.arterial",
-					"elementType": "labels.text.fill",
-					"stylers": [
-						{
-							"color": "#ffffff"
-						}
-					]
-				},
-				{
-					"featureType": "road.arterial",
-					"elementType": "labels.text.stroke",
-					"stylers": [
-						{
-							"color": "#2c2c2c"
-						}
-					]
-				},
-				{
-					"featureType": "road.local",
-					"elementType": "geometry",
-					"stylers": [
-						{
-							"color": "#000000"
-						},
-						{
-							"lightness": 16
-						}
-					]
-				},
-				{
-					"featureType": "road.local",
-					"elementType": "labels.text.fill",
-					"stylers": [
-						{
-							"color": "#999999"
-						}
-					]
-				},
-				{
-					"featureType": "transit",
-					"elementType": "geometry",
-					"stylers": [
-						{
-							"color": "#000000"
-						},
-						{
-							"lightness": 19
-						}
-					]
-				},
-				{
-					"featureType": "water",
-					"elementType": "geometry",
-					"stylers": [
-						{
-							"color": "#000000"
-						},
-						{
-							"lightness": 17
-						}
-					]
-				}
-			]
+            // Get each component of the address from the place details
+            // and fill the corresponding field on the form.
+            for (var i = 0; i < place.address_components.length; i++)
+            {
+                var addressType = place.address_components[i].types[0];
+                if (componentForm[addressType])
+                {
+                    var val = place.address_components[i][componentForm[addressType]];
+                    document.getElementById(addressType).value = val;
+                }
+            }
+        }
 
-			map = new google.maps.Map(document.getElementById('map'), { zoom: 4, center: geolocation, streetViewControl: true, mapTypeControl: false });
-			map.setOptions({ styles: style });
+        // Bias the autocomplete object to the user's geographical location,
+        // as supplied by the browser's 'navigator.geolocation' object.
+        function geolocate()
+        {
+            if (navigator.geolocation)
+            {
+                navigator.geolocation.getCurrentPosition(function (position)
+                {
+                    var geolocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    initMap(geolocation);
+                    // console.log(geolocation);
+                    var circle = new google.maps.Circle({
+                        center: geolocation,
+                        radius: position.coords.accuracy
+                    });
+                    autocomplete.setBounds(circle.getBounds());
+                });
+            }
+        }
 
-			let marker = new google.maps.Marker({ position: geolocation, map: map });
-			// var flightPlanCoordinates = [
-			// 	{ lat: 37.772, lng: -122.214 },
-			// 	{ lat: 21.291, lng: -157.821 },
-			// 	{ lat: -18.142, lng: 178.431 },
-			// 	{ lat: -27.467, lng: 153.027 }
-			// ];
-			// var flightPath = new google.maps.Polyline({
-			// 	path: flightPlanCoordinates,
-			// 	geodesic: true,
-			// 	strokeColor: '#FF0000',
-			// 	strokeOpacity: 1.0,
-			// 	strokeWeight: 2
-			// });
+        function initMap(geolocation)
+        {
+            let style = [
+                {
+                    "featureType": "all",
+                    "elementType": "labels",
+                    "stylers": [
+                        {
+                            "visibility": "on"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "all",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "saturation": 36
+                        },
+                        {
+                            "color": "#000000"
+                        },
+                        {
+                            "lightness": 40
+                        }
+                    ]
+                },
+                {
+                    "featureType": "all",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [
+                        {
+                            "visibility": "on"
+                        },
+                        {
+                            "color": "#000000"
+                        },
+                        {
+                            "lightness": 16
+                        }
+                    ]
+                },
+                {
+                    "featureType": "all",
+                    "elementType": "labels.icon",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "administrative",
+                    "elementType": "geometry.fill",
+                    "stylers": [
+                        {
+                            "color": "#000000"
+                        },
+                        {
+                            "lightness": 20
+                        }
+                    ]
+                },
+                {
+                    "featureType": "administrative",
+                    "elementType": "geometry.stroke",
+                    "stylers": [
+                        {
+                            "color": "#000000"
+                        },
+                        {
+                            "lightness": 17
+                        },
+                        {
+                            "weight": 1.2
+                        }
+                    ]
+                },
+                {
+                    "featureType": "administrative.country",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#e5c163"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "administrative.locality",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#c4c4c4"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "administrative.neighborhood",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#e5c163"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "landscape",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#000000"
+                        },
+                        {
+                            "lightness": 20
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#000000"
+                        },
+                        {
+                            "lightness": 21
+                        },
+                        {
+                            "visibility": "on"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi.business",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "visibility": "on"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry.fill",
+                    "stylers": [
+                        {
+                            "color": "#e5c163"
+                        },
+                        {
+                            "lightness": "0"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry.stroke",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#ffffff"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [
+                        {
+                            "color": "#e5c163"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.arterial",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#000000"
+                        },
+                        {
+                            "lightness": 18
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.arterial",
+                    "elementType": "geometry.fill",
+                    "stylers": [
+                        {
+                            "color": "#575757"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.arterial",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#ffffff"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.arterial",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [
+                        {
+                            "color": "#2c2c2c"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.local",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#000000"
+                        },
+                        {
+                            "lightness": 16
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.local",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#999999"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#000000"
+                        },
+                        {
+                            "lightness": 19
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#000000"
+                        },
+                        {
+                            "lightness": 17
+                        }
+                    ]
+                }
+            ]
 
-			// flightPath.setMap(map);
-		}
+            map = new google.maps.Map(document.getElementById('map'), { zoom: 4, center: geolocation, streetViewControl: true, mapTypeControl: false });
+            map.setOptions({ styles: style });
 
-		function setNewMarker(position, map)
-		{
-			let marker = new google.maps.Marker({ position: uluru, map: map });
-		}
+            let marker = new google.maps.Marker({ position: geolocation, map: map });
+            // var flightPlanCoordinates = [
+            // 	{ lat: 37.772, lng: -122.214 },
+            // 	{ lat: 21.291, lng: -157.821 },
+            // 	{ lat: -18.142, lng: 178.431 },
+            // 	{ lat: -27.467, lng: 153.027 }
+            // ];
+            // var flightPath = new google.maps.Polyline({
+            // 	path: flightPlanCoordinates,
+            // 	geodesic: true,
+            // 	strokeColor: '#FF0000',
+            // 	strokeOpacity: 1.0,
+            // 	strokeWeight: 2
+            // });
 
-	</script>
-	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDM1Md63YaQY-nPkpoK60q8S8MJ_2pjFgc&libraries=places&callback=initialize"></script>
+            // flightPath.setMap(map);
+        }
+
+        function setNewMarker(position, map)
+        {
+            let marker = new google.maps.Marker({ position: uluru, map: map });
+        }
+
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDM1Md63YaQY-nPkpoK60q8S8MJ_2pjFgc&libraries=places&callback=initialize"></script>
 </body>
 
 </html>

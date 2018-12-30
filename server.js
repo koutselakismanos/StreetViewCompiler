@@ -1,6 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
-const request = require('request');
+const request = require('request').defaults({ encoding: null });
 const bodyParser = require('body-parser');
 const fs = require('fs');
 
@@ -100,12 +100,20 @@ app.post('/api/log', (req, response) =>
     // 	})
 });
 
-app.get('/api/download', (req, res) =>
+app.get('/api/download', (req, response) =>
 {
-    download('https://www.google.com/images/srpr/logo3w.png', 'images/google.png', function ()
+    // let img = new Image();
+    // img.src = "https://www.google.com/images/srpr/logo3w.png";
+    // download('https://www.google.com/images/srpr/logo3w.png', 'images/google.png', function ()
+    // {
+    //     console.log('done');
+    // });
+    let url = "https://www.google.com/images/srpr/logo3w.png";
+    request.get(url, (err, res, body) =>
     {
-        console.log('done');
-    });
+        console.log(body);
+        response.send('meow');
+    })
 });
 
 let download = (uri, filename, callback) =>
