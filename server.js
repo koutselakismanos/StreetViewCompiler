@@ -1,9 +1,13 @@
 const express = require('express');
 const morgan = require('morgan');
 const request = require('request').defaults({ encoding: null });
+const rq = require('request-promise');
 const bodyParser = require('body-parser');
 const fs = require('fs');
-const ffmpeg = require('');
+let ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+let ffmpeg = require('fluent-ffmpeg');
+ffmpeg.setFfmpegPath(ffmpegPath);
+let command = ffmpeg();
 
 const app = express();
 const port = 5000;
@@ -58,10 +62,50 @@ app.get('/api/route/', (req, response) =>
             // 		if (err) throw err;
             // 		console.log(json);
             // 	})
-            download(url, 'google.png', function ()
+            const twoPI = Math.PI * 2;
+            const rad2Deg = 57.2957795130823209;
+            let angle = 0;
+            let counter = -1;
+            for (let i = 0; i < positions.polyline.length - 2; i++)
             {
-                console.log('done');
-            });
+                if (positions.polyline[i] !== positions.polyline[i + 1] || i === 0)
+                {
+                    // console.log(Math.atan2(positions.polyline[i + 1].lat - positions.polyline[i].lat,
+                    //     positions.polyline[i].lng - positions.polyline[i + 1].lng));
+                    let theta = Math.atan2(positions.polyline[i + 1].lat - positions.polyline[i].lat,
+                        positions.polyline[i].lng - positions.polyline[i + 1].lng)
+                    console.log(theta);
+
+                    // console.log(theta);
+                    // console.log(theta);
+                    if (theta < 0.0)
+                    {
+                        theta += twoPI;
+                    }
+                    angle = rad2Deg * theta;
+
+                    console.log(angle);
+
+                    let imgUrl = "https://maps.googleapis.com/maps/api/streetview?size=1200x720&location=";
+                    let elseUrl = `&heading=${angle - 90}&key=AIzaSyBldcMxKcF6eFmRk7XBbwjZAXwtIxL1dZQ`;
+                    imgUrl = imgUrl + positions.polyline[i].lat + ',' + positions.polyline[i].lng + elseUrl;
+                    counter++;
+                    download(imgUrl, `assets/pics/st_${pad(counter + 1, 3)}.jpg`, function ()
+                    {
+                        console.log('done');
+                    });
+                }
+            }
+
+            // command
+            //     .on('end', onEnd)
+            //     .on('progress', onProgress)
+            //     .on('error', onError)
+            //     .input(__dirname + '/assets/pics/st_%03d.png')
+            //     .inputFPS(1 / 5)
+            //     .output(__dirname + '/assets/demo/meme.mp4')
+            //     .noAudio()
+            //     .run();
 
             response.json(positions);
             // console.log(positions);
@@ -75,10 +119,52 @@ app.get('/api/route/', (req, response) =>
     // console.log(positions);
 });
 
+function onProgress(progress)
+{
+    if (progress.timemark != timemark) 
+    {
+        timemark = progress.timemark;
+        console.log('Time mark: ' + timemark + "...");
+    }
+}
+
+function onError(err, stdout, stderr)
+{
+    console.log('Cannot process video: ' + err.message);
+}
+
+function onEnd() 
+{
+    console.log('Finished processing');
+}
+
+function pad(n, width, z)
+{
+    z = z || '0';
+    n = n + '';
+    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
+
+app.get('/api/meow', (req, res) =>
+{
+    command
+        .on('end', onEnd)
+        // .on('progress', onProgress)
+        .on('error', onError)
+        .input('assets/pics/st_%03d.jpg')
+        .inputFPS(10)
+        .output(__dirname + '/assets/demo/meme.mp4')
+        .outputFps(30)
+        .noAudio()
+        .run();
+
+    res.send('hey');
+});
+
 app.post('/api/log', (req, response) =>
 {
     console.log(req.body.value1, req.body.value2);
-    url = `https://maps.googleapis.com/maps/api/directions/json?&origin=${req.body.value1.split(" ").join("+")}&destination=${req.body.value2.split(" ").join("+")}&key=AIzaSyDM1Md63YaQY-nPkpoK60q8S8MJ_2pjFgc`;
+    url = `https://maps.googleapis.com/maps/api/directions/json?&origin=${req.body.value1.split(" ").join("+")}&destination=${req.body.value2.split(" ").join("+")}&key=AIzaSyBldcMxKcF6eFmRk7XBbwjZAXwtIxL1dZQ`;
 
     console.log(url)
     // request({
@@ -101,30 +187,34 @@ app.post('/api/log', (req, response) =>
     // 	})
 });
 
-app.get('/api/download', (req, response) =>
-{
-    // let img = new Image();
-    // img.src = "https://www.google.com/images/srpr/logo3w.png";
-    // download('https://www.google.com/images/srpr/logo3w.png', 'images/google.png', function ()
-    // {
-    //     console.log('done');
-    // });
-    let url = "https://www.google.com/images/srpr/logo3w.png";
-    request.get(url, (err, res, body) =>
-    {
-        console.log(body);
-        response.send('meow');
-    })
-});
+// app.get('/api/download', (req, response) =>
+// {
+//     // let img = new Image();
+//     // img.src = "https://www.google.com/images/srpr/logo3w.png";
+//     // download('https://www.google.com/images/srpr/logo3w.png', 'images/google.png', function ()
+//     // {
+//     //     console.log('done');
+//     // });
+//     let url = "https://www.google.com/images/srpr/logo3w.png";
+//     request.get(url, (err, res, body) =>
+//     {
+//         console.log(body);
+//         response.send('meow');
+//     })
+// });
 
 let download = (uri, filename, callback) =>
 {
     request.head(uri, (err, res, body) =>
     {
-        console.log('content-type:', res.headers['content-type']);
-        console.log('content-length:', res.headers['content-length']);
+        // console.log('content-type:', res.headers['content-type']);
+        // console.log('content-length:', res.headers['content-length']);
 
+        // console.log(err);
         request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+    }).on('error', error =>
+    {
+        console.log(error)
     });
 };
 

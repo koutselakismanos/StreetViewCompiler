@@ -20,8 +20,10 @@
     "@ffmpeg-installer/ffmpeg": "^1.0.17",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "fluent-ffmpeg": "^2.1.2",
     "morgan": "^1.9.1",
     "nodemon": "^1.18.9",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "request-promise": "^4.2.2"
   }
 }
