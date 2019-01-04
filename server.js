@@ -72,8 +72,8 @@ app.get('/api/route/', (req, response) =>
                 {
                     // console.log(Math.atan2(positions.polyline[i + 1].lat - positions.polyline[i].lat,
                     //     positions.polyline[i].lng - positions.polyline[i + 1].lng));
-                    let theta = Math.atan2(positions.polyline[i + 1].lat - positions.polyline[i].lat,
-                        positions.polyline[i].lng - positions.polyline[i + 1].lng)
+                    let theta = Math.atan2(positions.polyline[i + 2].lat - positions.polyline[i].lat,
+                        positions.polyline[i].lng - positions.polyline[i + 2].lng)
                     console.log(theta);
 
                     // console.log(theta);
@@ -166,7 +166,6 @@ app.post('/api/log', (req, response) =>
     console.log(req.body.value1, req.body.value2);
     url = `https://maps.googleapis.com/maps/api/directions/json?&origin=${req.body.value1.split(" ").join("+")}&destination=${req.body.value2.split(" ").join("+")}&key=AIzaSyBldcMxKcF6eFmRk7XBbwjZAXwtIxL1dZQ`;
 
-    console.log(url)
     // request({
     // 	url,
     // 	json: true
@@ -209,13 +208,10 @@ let download = (uri, filename, callback) =>
     {
         // console.log('content-type:', res.headers['content-type']);
         // console.log('content-length:', res.headers['content-length']);
-
         // console.log(err);
-        request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
-    }).on('error', error =>
-    {
-        console.log(error)
+        request(uri).on('error', (err) => { console.log('error') }).pipe(fs.createWriteStream(filename)).on('close', callback);
     });
+    // request.get(uri, enc)
 };
 
 
