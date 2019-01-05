@@ -18,6 +18,7 @@
   "license": "MIT",
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.17",
+    "async": "^2.6.1",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "fluent-ffmpeg": "^2.1.2",
