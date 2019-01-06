@@ -1,11 +1,12 @@
 const express = require('express');
 const morgan = require('morgan');
-const request = require('request').defaults({ encoding: null });
-const rq = require('request-promise');
+const rq = require('request')//.defaults({ encoding: null });
+// const rq = require('request-promise');
 const bodyParser = require('body-parser');
 const fs = require('fs');
-let ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
-let ffmpeg = require('fluent-ffmpeg');
+const async = require('async');
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+const ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
 let command = ffmpeg();
 
@@ -25,7 +26,8 @@ app.get('/api/', (req, res) =>
 app.get('/api/route/', (req, response) =>
 {
     console.log(url);
-    request({
+    let imgUrls = [];
+    rq({
         url,
         json: true
     }, (err, res, json) =>
@@ -35,7 +37,6 @@ app.get('/api/route/', (req, response) =>
                 routes: [],
                 polyline: []
             };
-            // let snapUrl = "https://roads.googleapis.com/v1/snapToRoads?path="
             json.routes[0].legs.filter(leg => Object.getOwnPropertyNames(leg).includes("steps"))
                 .forEach(leg => leg['steps'].forEach(step =>
                 {
@@ -44,24 +45,6 @@ app.get('/api/route/', (req, response) =>
                     // positions.routes.push(step.end_location);
                     positions.polyline.push(...decode(step.polyline.points));
                 }));
-            // positions.polyline += json.routes[0].overview_polyline.points;
-            // let meow = decode(json.routes[0].overview_polyline.points);
-            // meow.forEach((element, i) =>
-            // {
-            // 	if (i < 100)
-            // 		snapUrl += `${element.lat},${element.lng}|`
-            // })
-            // snapUrl = snapUrl.substring(0, snapUrl.length - 1);
-            // snapUrl += "&interpolate=true&key=AIzaSyDM1Md63YaQY-nPkpoK60q8S8MJ_2pjFgc"
-            // console.log(snapUrl);
-            // request({
-            // 	url: snapUrl,
-            // 	json: true
-            // }, (err, res, json) =>
-            // 	{
-            // 		if (err) throw err;
-            // 		console.log(json);
-            // 	})
             const twoPI = Math.PI * 2;
             const rad2Deg = 57.2957795130823209;
             let angle = 0;
@@ -70,14 +53,10 @@ app.get('/api/route/', (req, response) =>
             {
                 if (positions.polyline[i] !== positions.polyline[i + 1] || i === 0)
                 {
-                    // console.log(Math.atan2(positions.polyline[i + 1].lat - positions.polyline[i].lat,
-                    //     positions.polyline[i].lng - positions.polyline[i + 1].lng));
                     let theta = Math.atan2(positions.polyline[i + 2].lat - positions.polyline[i].lat,
                         positions.polyline[i].lng - positions.polyline[i + 2].lng)
                     console.log(theta);
 
-                    // console.log(theta);
-                    // console.log(theta);
                     if (theta < 0.0)
                     {
                         theta += twoPI;
@@ -87,37 +66,65 @@ app.get('/api/route/', (req, response) =>
                     console.log(angle);
 
                     let imgUrl = "https://maps.googleapis.com/maps/api/streetview?size=1200x720&location=";
-                    let elseUrl = `&heading=${angle - 90}&key=AIzaSyBldcMxKcF6eFmRk7XBbwjZAXwtIxL1dZQ`;
+                    let elseUrl = `&heading=${angle - 90}&key=AIzaSyAfa6HsPmjDkkaeZGEzGhXUh6gMyMmUnc4`;
                     imgUrl = imgUrl + positions.polyline[i].lat + ',' + positions.polyline[i].lng + elseUrl;
                     counter++;
-                    download(imgUrl, `assets/pics/st_${pad(counter + 1, 3)}.jpg`, function ()
-                    {
-                        console.log('done');
-                    });
+                    imgUrls.push(imgUrl);
+                    // download(imgUrl, `assets/pics/st_${pad(counter + 1, 3)}.jpg`, function ()
+                    // {
+                    //     console.log('done');
+                    // });
                 }
             }
 
-            // command
-            //     .on('end', onEnd)
-            //     .on('progress', onProgress)
-            //     .on('error', onError)
-            //     .input(__dirname + '/assets/pics/st_%03d.png')
-            //     .inputFPS(1 / 5)
-            //     .output(__dirname + '/assets/demo/meme.mp4')
-            //     .noAudio()
-            //     .run();
 
             response.json(positions);
-            // console.log(positions);
-            // 	.forEach(element =>
-            // {
-            // 	console.log(element.start_location);
-            // 	positions.push(element.start_location);
-            // });
+            downloadImgs(imgUrls)
+
         })
 
-    // console.log(positions);
 });
+
+function downloadImgs(imgUrls)
+{
+    let q = async.queue(function (task, callback)
+    {
+        rq.get(task.url)
+            .on('response', function (response)
+            {
+                console.log(response.statusCode, response.headers['content-type']);
+            })
+            .on('error', function (err)
+            {
+                console.log('err')
+                callback(err);
+            })
+            .pipe(fs.createWriteStream(task.path))
+            .on('close', () =>
+            {
+                console.log('Image Downloaded');
+                callback();
+            });
+    }, 80);
+
+    q.drain = function ()
+    {
+        console.log('Im done here');
+        compilee();
+    };
+
+    imgUrls.forEach((url, i) =>
+    {
+        path = `assets/pics/st_${pad(i + 1, 3)}.jpg`
+        q.push({ url, path }, function (err)
+        {
+            if (err)
+            {
+                console.log(err);
+            }
+        });
+    });
+}
 
 function onProgress(progress)
 {
@@ -145,26 +152,31 @@ function pad(n, width, z)
     return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 }
 
-app.get('/api/meow', (req, res) =>
+function compilee()
 {
     command
         .on('end', onEnd)
         // .on('progress', onProgress)
         .on('error', onError)
         .input('assets/pics/st_%03d.jpg')
-        .inputFPS(10)
+        .inputFPS(30)
         .output(__dirname + '/assets/demo/meme.mp4')
         .outputFps(30)
         .noAudio()
         .run();
+}
 
-    res.send('hey');
+app.get('/api/video', (req, res) =>
+{
+    res.writeHead(200, { 'Content-type': 'video/mp4' })
+    let rs = fs.createReadStream("assets/demo/meme.mp4");
+    rs.pipe(res);
 });
 
 app.post('/api/log', (req, response) =>
 {
     console.log(req.body.value1, req.body.value2);
-    url = `https://maps.googleapis.com/maps/api/directions/json?&origin=${req.body.value1.split(" ").join("+")}&destination=${req.body.value2.split(" ").join("+")}&key=AIzaSyBldcMxKcF6eFmRk7XBbwjZAXwtIxL1dZQ`;
+    url = `https://maps.googleapis.com/maps/api/directions/json?&origin=${req.body.value1.split(" ").join("+")}&destination=${req.body.value2.split(" ").join("+")}&key=AIzaSyAfa6HsPmjDkkaeZGEzGhXUh6gMyMmUnc4`;
 
     // request({
     // 	url,
@@ -202,17 +214,17 @@ app.post('/api/log', (req, response) =>
 //     })
 // });
 
-let download = (uri, filename, callback) =>
-{
-    request.head(uri, (err, res, body) =>
-    {
-        // console.log('content-type:', res.headers['content-type']);
-        // console.log('content-length:', res.headers['content-length']);
-        // console.log(err);
-        request(uri).on('error', (err) => { console.log('error') }).pipe(fs.createWriteStream(filename)).on('close', callback);
-    });
-    // request.get(uri, enc)
-};
+// let download = (uri, filename, callback) =>
+// {
+//     request.head(uri, (err, res, body) =>
+//     {
+//         // console.log('content-type:', res.headers['content-type']);
+//         // console.log('content-length:', res.headers['content-length']);
+//         // console.log(err);
+//         request(uri).on('error', (err) => { console.log('error') }).pipe(fs.createWriteStream(filename)).on('close', callback);
+//     });
+//     // request.get(uri, enc)
+// };
 
 
 function decode(str, precision)

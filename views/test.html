@@ -105,8 +105,9 @@
             <td class="wideField" colspan="3"><input class="field" id="country" disabled="true" /></td>
         </tr>
     </table>
-    <img id="imagee" src="" alt="Smiley face" height="42" width="42">
-    <iframe id="iframee" src="" frameborder="0"></iframe>
+    <video id="videoPlayer" controls>
+        <source src="http://localhost:5000/api/video" type="video/mp4">
+    </video>
 
 
     <script>
@@ -168,7 +169,7 @@
                     // console.log(meow);
                     let pt = poly.polyline;
                     let imgUrl = "https://maps.googleapis.com/maps/api/streetview?size=1200x720&location=";
-                    let elseUrl = "&heading=161.78&key=AIzaSyBldcMxKcF6eFmRk7XBbwjZAXwtIxL1dZQ";
+                    let elseUrl = "&heading=161.78&key=AIzaSyAfa6HsPmjDkkaeZGEzGhXUh6gMyMmUnc4";
                     let currentPos = 0;
                     imgUrl = imgUrl + pt[currentPos].lat + ',' + pt[currentPos].lng + elseUrl;
                     console.log(imgUrl);
@@ -627,7 +628,7 @@
                 }
             ]
 
-            map = new google.maps.Map(document.getElementById('map'), { zoom: 4, center: geolocation, streetViewControl: true, mapTypeControl: false });
+            map = new google.maps.Map(document.getElementById('map'), { zoom: 4, center: geolocation, streetViewControl: false, mapTypeControl: false });
             map.setOptions({ styles: style });
 
             let marker = new google.maps.Marker({ position: geolocation, map: map });
@@ -654,7 +655,7 @@
         }
 
     </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBldcMxKcF6eFmRk7XBbwjZAXwtIxL1dZQ&libraries=places&callback=initialize"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfa6HsPmjDkkaeZGEzGhXUh6gMyMmUnc4&libraries=places&callback=initialize"></script>
 </body>
 
 </html>
