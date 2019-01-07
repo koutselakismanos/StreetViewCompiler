@@ -160,7 +160,7 @@ function compilee()
         .on('error', onError)
         .input('assets/pics/st_%03d.jpg')
         .inputFPS(30)
-        .output(__dirname + '/assets/demo/meme.mp4')
+        .output(__dirname + '/assets/demo/pepe.mp4')
         .outputFps(30)
         .noAudio()
         .run();
