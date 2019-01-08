@@ -1,4 +1,5 @@
 const express = require('express');
+const socket = require('socket.io');
 const morgan = require('morgan');
 const rq = require('request')//.defaults({ encoding: null });
 // const rq = require('request-promise');
@@ -14,6 +15,11 @@ const app = express();
 const port = 5000;
 let url;
 
+let server = app.listen(port, '0.0.0.0', () =>
+{
+    console.log(`Server started on port ${port}`);
+});
+
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -22,6 +28,12 @@ app.get('/api/', (req, res) =>
 {
     res.status(200).sendFile('views/test.html', { root: __dirname });
 });
+
+
+app.get('/api/result', (req, res) =>
+{
+    res.sendFile(__dirname + '/views/home.html');
+})
 
 app.get('/api/route/', (req, response) =>
 {
@@ -314,4 +326,29 @@ function decode(str, precision)
     return coordinates;
 };
 
-app.listen(port, '0.0.0.0', () => { console.log(`Server started on port ${port}`); });
+
+let io = socket(server);
+
+io.on('connection', (socket) =>
+{
+    let playCount = 0;
+    let pauseCount = 0;
+    io.emit('log', { playCount, pauseCount });
+    socket.on('play', () =>
+    {
+        playCount++;
+        console.log('Play button pressed');
+        io.emit('playCount', { playCount })
+    });
+    socket.on('pause', () =>
+    {
+        pauseCount++;
+        console.log('Pause button pressed');
+        io.emit('pauseCount', { pauseCount })
+    })
+    socket.on('disconnect', () =>
+    {
+        console.log(socket.id, 'disconnected...')
+        io.emit('log', { playCount, pauseCount });
+    })
+});
