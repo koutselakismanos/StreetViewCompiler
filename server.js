@@ -331,6 +331,7 @@ let io = socket(server);
 
 io.on('connection', (socket) =>
 {
+    console.log(socket.id, 'connected...')
     let playCount = 0;
     let pauseCount = 0;
     io.emit('log', { playCount, pauseCount });

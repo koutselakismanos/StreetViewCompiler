@@ -1,0 +1,53 @@
+*{
+    margin:0;
+    padding: 0;
+}
+
+body{
+    font-family: Lato;
+    font-style: normal;
+    font-weight: bold;
+    line-height: normal;
+    font-size: 20px;
+    width: 80%;
+}
+
+/* HEADER----------------------------*/
+
+#header{
+    background-color: #2B2B2B;
+    background: #2B2B2B no-repeat url('../assets/hero_image.png') ;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    /* left: 0px;
+    top: 0px; */
+
+    /* background: #2B2B2B; */
+}
+
+
+.title{
+    font-size: 60px;
+    color: white;
+    text-align: right;
+}
+
+.description{
+    color:white;
+    opacity: 0.9;
+}
+
+.header-btn{
+    text-decoration: none;
+    color: #393939;
+    background: linear-gradient(270deg, #E5C163 0%, #CFB46E 100%);
+    border-radius: 3px;
+    position: absolute;
+    left: 20%;
+    box-shadow: 0px 3px 1px rgba(0, 0, 0, 0.2);
+    text-align: right;
+
+
+}
+

@@ -5,14 +5,16 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Street View Player</title>
+    <link rel="stylesheet" href="../styles/home.css">
 </head>
 
 <body>
-    <h1>Welcome home</h1>
-    <button id="play" onclick="playClicked()">Play</button>
-    <h6 id="playClicked">0</h6>
-    <button id="pause" onclick="pauseClicked()">Pause</button>
-    <h6 id="pauseClicked">0</h6>
+    <div id="header">
+        <div class="title">Google Street View Player</div>
+        <!-- <p class="description">This is a video compiler for the street view API.<br>It takes the current position and -->
+        <!-- the destination<br> and transforms it a interactive 360 experience.</p> -->
+        <a href="#" class="header-btn">Try it out</a>
+    </div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
         var socket = io.connect('http://localhost:5000');
