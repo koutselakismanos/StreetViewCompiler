@@ -3,19 +3,20 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Street View Player</title>
     <link rel="stylesheet" href="../styles/home.css">
+    <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 </head>
 
 <body>
-    <div id="header">
-        <div class="title">Google Street View Player</div>
-        <!-- <p class="description">This is a video compiler for the street view API.<br>It takes the current position and -->
-        <!-- the destination<br> and transforms it a interactive 360 experience.</p> -->
-        <a href="#" class="header-btn">Try it out</a>
-    </div>
-    <script src="/socket.io/socket.io.js"></script>
+    <header>
+        <div class="holder">
+            <div class="title">Google Street View Player</div>
+            <div class="btn"><a href="#">Try it out!</a></div>
+        </div>
+    </header>
+    <!-- <script src="/socket.io/socket.io.js"></script>
     <script>
         var socket = io.connect('http://localhost:5000');
 
@@ -48,7 +49,7 @@
             pauseText.innerText = data.pauseCount;
         });
 
-    </script>
+    </script> -->
 </body>
 
 </html>
