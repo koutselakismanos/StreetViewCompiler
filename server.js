@@ -1,7 +1,7 @@
 const express = require('express');
 const socket = require('socket.io');
 const morgan = require('morgan');
-const rq = require('request')//.defaults({ encoding: null });
+const rq = require('request')
 // const rq = require('request-promise');
 const bodyParser = require('body-parser');
 const fs = require('fs');
@@ -28,7 +28,6 @@ app.get('/api/', (req, res) =>
 {
     res.status(200).sendFile('views/test.html', { root: __dirname });
 });
-
 
 app.get('/api/result', (req, res) =>
 {
@@ -226,23 +225,23 @@ app.post('/api/log', (req, response) =>
     url = `https://maps.googleapis.com/maps/api/directions/json?&origin=${req.body.value1.split(" ").join("+")}&destination=${req.body.value2.split(" ").join("+")}&key=AIzaSyAfa6HsPmjDkkaeZGEzGhXUh6gMyMmUnc4`;
 
     // request({
-    // 	url,
-    // 	json: true
+    //  url,
+    //  json: true
     // }, (err, res, json) =>
-    // 	{
-    // 		if (err) throw err;
-    // 		let positions = {
-    // 			routes: [],
-    // 			polyline: []
-    // 		};
-    // 		// let snapUrl = "https://roads.googleapis.com/v1/snapToRoads?path="
-    // 		json.routes[0].legs.filter(leg => Object.getOwnPropertyNames(leg).includes("steps"))
-    // 			.forEach(leg => leg['steps'].forEach(step =>
-    // 			{
-    // 				positions.polyline.push(...decode(step.polyline.points));
-    // 			}));
-    // 		response.json(positions);
-    // 	})
+    //  {
+    //      if (err) throw err;
+    //      let positions = {
+    //          routes: [],
+    //          polyline: []
+    //      };
+    //      // let snapUrl = "https://roads.googleapis.com/v1/snapToRoads?path="
+    //      json.routes[0].legs.filter(leg => Object.getOwnPropertyNames(leg).includes("steps"))
+    //          .forEach(leg => leg['steps'].forEach(step =>
+    //          {
+    //              positions.polyline.push(...decode(step.polyline.points));
+    //          }));
+    //      response.json(positions);
+    //  })
 });
 
 // app.get('/api/download', (req, response) =>
@@ -325,7 +324,6 @@ function decode(str, precision)
 
     return coordinates;
 };
-
 
 let io = socket(server);
 
